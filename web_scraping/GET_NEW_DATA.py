@@ -2,7 +2,7 @@ from GET_OLX_APARTMENT import webscrapOLX
 from pymongo import MongoClient
 
 
-MONGODB_CONNECTION_STRING = "PLACE HERE MANGODB CONNECTION STRING"
+MONGODB_CONNECTION_STRING = ""
 client = MongoClient(MONGODB_CONNECTION_STRING)
 client.server_info()['ok']
 

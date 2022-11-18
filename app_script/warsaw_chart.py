@@ -1,10 +1,9 @@
-from urllib.request import urlopen
 import pandas as pd
-import json
+import geopandas as gpd
 import plotly.express as px
 from pymongo import MongoClient
 
-MONGODB_CONNECTION_STRING = "PLACE HERE MANGODB CONNECTION STRING"
+MONGODB_CONNECTION_STRING = ""
 client = MongoClient(MONGODB_CONNECTION_STRING)
 client.server_info()['ok']
 # Database Name
@@ -13,8 +12,7 @@ db = client["symbolsDB"]
 col = db["symbols"]
 
 def warsaw_choro(WARTOSC, actual_date):
-   with urlopen('https://raw.githubusercontent.com/andilabs/warszawa-dzielnice-geojson/master/warszawa-dzielnice.geojson') as response:
-      district_geo = json.load(response)
+   district_geo = gpd.read_file("app_script/warsaw_geojson.geojson")
    df = pd.DataFrame(list(col.find()))
    df = df.loc[df['Date'] == actual_date]
    df2 = df.groupby('District', as_index=False)[WARTOSC].mean()
@@ -43,7 +41,7 @@ def warsaw_density(actual_date):
    df = pd.DataFrame(list(col.find()))
    df = df.loc[df['Date'] == actual_date]
    df = df.loc[~(df['Price in PLN'] > 2000000),:]
-   fig = px.density_heatmap(df, x="District", y="Price in PLN")
+   fig = px.density_heatmap(df, y="District", x="Price in PLN")
    return fig
 
 def warsaw_scatter(actual_date):
@@ -52,4 +50,11 @@ def warsaw_scatter(actual_date):
    df = df.loc[~(df['Price in PLN'] > 2000000),:]
    fig = px.scatter(df, x="Apartment area", y="Price per meter", opacity=0.65,
                   trendline='ols', trendline_color_override='darkblue')
+   return fig
+
+def district_hist(WARTOSC, district_name):
+   df = pd.DataFrame(list(col.find()))
+   df = df.loc[df['District'] == district_name]
+   df = df.loc[~(df[WARTOSC] > 2000000),:]
+   fig = px.histogram(df, x=WARTOSC)
    return fig
