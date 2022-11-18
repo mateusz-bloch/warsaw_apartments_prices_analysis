@@ -3,7 +3,11 @@ import geopandas as gpd
 import plotly.express as px
 from pymongo import MongoClient
 
-MONGODB_CONNECTION_STRING = ""
+districts = ["Bemowo", "Białołęka", "Bielany", "Mokotów", "Ochota", "Praga Południe", "Praga Północ", "Rembertów", "Targówek", "Ursus", "Ursynów", "Wawer", "Wesoła", "Wilanów", "Wola", "Włochy", "Śródmieście", "Żoliborz"]
+
+district_geo = gpd.read_file("app_script/warsaw_geojson.geojson")
+
+MONGODB_CONNECTION_STRING = "MONGODB STRING"
 client = MongoClient(MONGODB_CONNECTION_STRING)
 client.server_info()['ok']
 # Database Name
@@ -11,8 +15,13 @@ db = client["symbolsDB"]
 # Collection Name
 col = db["symbols"]
 
+def historical_chart():
+   df = pd.DataFrame(list(col.find()))
+   df = df.groupby('Date', as_index=False)['Price in PLN'].mean()
+   fig = px.line(df, x='Date', y="Price in PLN")
+   return fig
+
 def warsaw_choro(WARTOSC, actual_date):
-   district_geo = gpd.read_file("app_script/warsaw_geojson.geojson")
    df = pd.DataFrame(list(col.find()))
    df = df.loc[df['Date'] == actual_date]
    df2 = df.groupby('District', as_index=False)[WARTOSC].mean()

@@ -15,9 +15,25 @@ districts = ["Bemowo", "Białołęka", "Bielany", "Mokotów", "Ochota", "Praga P
 for i in range(delta.days + 1):
     days.append(str(start_date + timedelta(days=i)))
 
+fig = historical_chart()
+
 app.layout = html.Div([
     html.H1('Warsaw apartment prices '),
+    dbc.Row([
+        dbc.Col([
+            dcc.Graph(
+                id = "historical_chart",
+                figure=fig
+            ),
+        ], width=6)
+    ], justify="center"),
+    html.H2('You can choose the date: '),
     dcc.Dropdown(days, str(days[-1]), id='date_dropdown', className='dropdown_class'),
+    dcc.Loading(
+        id="loading-1",
+        type="default",
+        children=html.Div(id="loading-output-1")
+    ),
     dbc.Row([
         dbc.Col([
             html.H3('Average price of apartaments'),
@@ -74,7 +90,13 @@ app.layout = html.Div([
         ], width=3)
     ], justify="center"),
     html.H2('You can choose the district: '),
+    # dcc.Slider(0, 17, marks={i: f'{item}' for item in districts}, value=0, id='district_dropdown'),
     dcc.Dropdown(districts, str(districts[0]), id='district_dropdown', className='dropdown_class'),
+    dcc.Loading(
+        id="loading-2",
+        type="default",
+        children=html.Div(id="loading-output-2")
+    ),
         dbc.Row([
         dbc.Col([
             html.H3('Price of Apartaments by the number of advertisements'),
@@ -99,6 +121,7 @@ app.layout = html.Div([
 ])
 
 @app.callback(
+    Output("loading-output-1", "children"),
     Output('choro_cena', 'figure'),
     Output('choro_cena_za_metr', 'figure'),
     Output('choro_metraz', 'figure'),
@@ -117,9 +140,11 @@ def update_figure(date_dropdown):
     hist_metraz = warsaw_hist('Apartment area', date_dropdown)
     scatter_diag = warsaw_scatter(date_dropdown)
     density_diag = warsaw_density(date_dropdown)
-    return choro_cena, choro_cena_za_metr, choro_metraz, hist_cena, hist_cena_za_metr, hist_metraz, scatter_diag, density_diag
+    children = []
+    return children, choro_cena, choro_cena_za_metr, choro_metraz, hist_cena, hist_cena_za_metr, hist_metraz, scatter_diag, density_diag
 
 @app.callback(
+    Output("loading-output-2", "children"),
     Output('hist_cena_district', 'figure'),
     Output('hist_cena_za_metr_district', 'figure'),
     Output('hist_metraz_district', 'figure'),
@@ -128,7 +153,8 @@ def update_figure(district_dropdown):
     hist_cena_distric = district_hist('Price in PLN', district_dropdown)
     hist_cena_za_metr_district = district_hist('Price per meter', district_dropdown)
     hist_metraz_district = district_hist('Apartment area', district_dropdown)
-    return hist_cena_distric, hist_cena_za_metr_district, hist_metraz_district
+    children = []
+    return children, hist_cena_distric, hist_cena_za_metr_district, hist_metraz_district
 
 if __name__ == '__main__':
     app.run_server(debug=True)
