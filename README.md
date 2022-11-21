@@ -1,4 +1,13 @@
 # Simple dash app about apartments prices in Warsaw
-Data obtained by web-scraping from the OLX website are sent to a Mongo database.
 The application made in Dash generates charts based on data from database.
 You can select the day to which the data relates.
+You can also select a district for which other charts are to be generated.
+
+<img src="README_ASSETS/11.png" alt="11" style="height: 100px; width:100px;"/>
+<img src="README_ASSETS/11.png" alt="12" style="height: 100px; width:100px;"/>
+<img src="README_ASSETS/11.png" alt="13" style="height: 100px; width:100px;"/>
+
+
+
+## Data Collection 
+The data is retrieved every day at midnight using a self-written python web-scraping script and is automatically sent to the mongo database.
